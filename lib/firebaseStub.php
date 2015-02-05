@@ -55,6 +55,11 @@ class FirebaseStub
       return $this->_getGetResponse();
     }
 
+    public function getShallow($path)
+    {
+        return $this->_getGetResponse();
+    }
+
     public function delete($path)
     {
       return $this->_getDeleteResponse();

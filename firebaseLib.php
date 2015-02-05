@@ -76,12 +76,14 @@ class Firebase implements FirebaseInterface
      *
      * @param String $path to data
      */
-    private function _getJsonPath($path)
+    private function _getJsonPath($path, $shallow = false)
     {
         $url = $this->_baseURI;
         $path = ltrim($path, '/');
         $auth = ($this->_token == '') ? '' : '?auth=' . $this->_token;
-        return $url . $path . '.json' . $auth;
+        $shallow = $shallow ? ($auth ? '&' : '?') . 'shallow=true' : '';
+
+        return $url . $path . '.json' . $auth . $shallow;
     }
 
     /**
@@ -159,6 +161,25 @@ class Firebase implements FirebaseInterface
     }
 
     /**
+     * Reading data from Firebase
+     * HTTP 200: Ok
+     *
+     * @param String $path Path
+     *
+     * @return Array Response
+     */
+    public function getShallow($path) {
+        try {
+            $ch = $this->_getCurlHandler($path, 'GET', true);
+            $return = curl_exec($ch);
+            curl_close($ch);
+        } catch (Exception $e) {
+            $return = null;
+        }
+        return $return;
+    }
+
+    /**
      * Deletes data from Firebase
      * HTTP 204: Ok
      *
@@ -185,9 +206,9 @@ class Firebase implements FirebaseInterface
      *
      * @return CURL Curl Handler
      */
-    private function _getCurlHandler($path, $mode)
+    private function _getCurlHandler($path, $mode, $shallow = false)
     {
-        $url = $this->_getJsonPath($path);
+        $url = $this->_getJsonPath($path, $shallow);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->_timeout);

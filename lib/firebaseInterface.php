@@ -12,5 +12,6 @@ interface FirebaseInterface
   public function push($path, $data);
   public function update($path, $data);
   public function get($path);
+  public function getShallow($path);
   public function delete($path);
 }
